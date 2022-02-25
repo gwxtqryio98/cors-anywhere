@@ -98,6 +98,11 @@ proxy requests. The following options are supported:
 * array of strings `originWhitelist` - If set, requests whose origin is not listed are blocked.  
   If this list is empty, all origins are allowed.
   Example: `['https://good.example.com', 'http://good.example.com']`
+* array of strings `targetBlacklist` - If set, requests whose target is listed are blocked.  
+  Example: `['https://bad.example.com', 'http://bad.example.com']`
+* array of strings `targetWhitelist` - If set, requests whose target is not listed are blocked.  
+  If this list is empty, all targets are allowed.
+  Example: `['https://good.example.com', 'http://good.example.com']`
 * function `handleInitialRequest` - If set, it is called with the request, response and a parsed
   URL of the requested destination (null if unavailable). If the function returns true, the request
   will not be handled further. Then the function is responsible for handling the request.
@@ -148,7 +153,14 @@ For instance, to run a CORS Anywhere server that accepts any request from some e
 port 8080, use:
 ```
 export PORT=8080
-export CORSANYWHERE_WHITELIST=https://example.com,http://example.com,http://example.com:8080
+export CORSANYWHERE_SOURCE_WHITELIST=https://example.com,http://example.com,http://example.com:8080
+node server.js
+```
+
+Similarly, to run a CORS Anywhere server that proxies only to example.com sites on port 8080, use:
+```
+export PORT=8080
+export CORSANYWHERE_TARGET_WHITELIST=https://example.com,http://example.com,http://example.com:8080
 node server.js
 ```
 
@@ -162,15 +174,21 @@ except for my.example.com and my2.example.com (which may be unlimited), use:
 
 ```
 export PORT=8080
-export CORSANYWHERE_BLACKLIST=https://abuse.example.com,http://abuse.example.com
+export CORSANYWHERE_SOURCE_BLACKLIST=https://abuse.example.com,http://abuse.example.com
 export CORSANYWHERE_RATELIMIT='50 3 my.example.com my2.example.com'
 node server.js
 ```
 
+To enable proxying to all sites except to example.com, use:
+```
+export PORT=8080
+export CORSANYWHERE_TARGET_BLACKLIST=https://example.com,http://example.com
+node server.js
+```
 
 ## License
 
-Copyright (C) 2013 - 2021 Rob Wu <rob@robwu.nl>
+Copyright (C) 2013 - 2022 Rob Wu <rob@robwu.nl>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

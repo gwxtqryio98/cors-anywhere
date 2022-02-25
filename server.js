@@ -3,12 +3,18 @@ var host = process.env.HOST || '0.0.0.0';
 // Listen on a specific port via the PORT environment variable
 var port = process.env.PORT || 8080;
 
-// Grab the blacklist from the command-line so that we can update the blacklist without deploying
-// again. CORS Anywhere is open by design, and this blacklist is not used, except for countering
-// immediate abuse (e.g. denial of service). If you want to block all origins except for some,
-// use originWhitelist instead.
-var originBlacklist = parseEnvList(process.env.CORSANYWHERE_BLACKLIST);
-var originWhitelist = parseEnvList(process.env.CORSANYWHERE_WHITELIST);
+// Grab the whitelists and blacklists from the command-line so that we can update them without redeploying.
+
+// CORS Anywhere is open by design, so this blacklist is only used in countering immediate abuse (e.g. denial of service).
+// If you want to block all origins except for some, use originWhitelist instead.
+var originBlacklist = parseEnvList(process.env.CORSANYWHERE_SOURCE_BLACKLIST);
+var originWhitelist = parseEnvList(process.env.CORSANYWHERE_SOURCE_WHITELIST);
+
+// This blacklist will define all the URLs that are NOT to be proxied by the server.
+// If you want to block all targets except for some, use targetWhitelist instead.
+var targetBlacklist = parseEnvList(process.env.CORSANYWHERE_TARGET_BLACKLIST);
+var targetWhitelist = parseEnvList(process.env.CORSANYWHERE_TARGET_WHITELIST);
+
 function parseEnvList(env) {
   if (!env) {
     return [];
@@ -23,6 +29,8 @@ var cors_proxy = require('./lib/cors-anywhere');
 cors_proxy.createServer({
   originBlacklist: originBlacklist,
   originWhitelist: originWhitelist,
+  targetBlacklist: targetBlacklist,
+  targetWhitelist: targetWhitelist,
   requireHeader: ['origin', 'x-requested-with'],
   checkRateLimit: checkRateLimit,
   removeHeaders: [
